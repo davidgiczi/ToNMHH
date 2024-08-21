@@ -4,6 +4,7 @@ import hu.david.giczi.mvmxpert.tonmhh.model.ParcelData;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.swing.*;
@@ -195,25 +196,44 @@ public class FileProcess {
     private void saveParcelData(String fileName) throws IOException{
         InputStream is = FileProcess.class.getClassLoader()
                 .getResourceAsStream("nmhh_template/NMHH.xlsx");
-        XSSFWorkbook wb = new XSSFWorkbook(Objects.requireNonNull(is));
+        XSSFWorkbook workbook = new XSSFWorkbook(Objects.requireNonNull(is));
         File outputFile = new File(FOLDER_PATH + "/" + fileName + ".xlsx");
         if( outputFile.exists() ){
             if ( JOptionPane.showConfirmDialog(null, "Létező fájl:\n" +
                             outputFile.getAbsolutePath() , "Felülírja?",
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                FileOutputStream out = new FileOutputStream(outputFile);
-                wb.write(out);
-                out.close();
+               saveData(workbook, outputFile);
             } else {
                 return;
             }
         }
-        FileOutputStream out = new FileOutputStream(outputFile);
-        wb.write(out);
-        out.close();
+        saveData(workbook, outputFile);
         JOptionPane.showMessageDialog(null,
                 "Feldolgozott földrészlet adatok mentve:\n" + outputFile.getAbsolutePath(),
                 "Fájl mentve",
                 JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void saveData(XSSFWorkbook workbook, File outputFile) throws IOException{
+        FileOutputStream out = new FileOutputStream(outputFile);
+        XSSFSheet sheet1 =  workbook.getSheetAt(0);
+        int rowIndex = 1;
+        for (ParcelData parcelData : FileProcess.PARCEL_DATA_LIST) {
+            sheet1.getRow(rowIndex).getCell(0).setCellValue(parcelData.getTown());
+            sheet1.getRow(rowIndex).getCell(1).setCellValue(parcelData.getLocation());
+            sheet1.getRow(rowIndex).getCell(2).setCellValue(parcelData.getParcelId());
+            rowIndex++;
+        }
+        rowIndex = 1;
+        XSSFSheet sheet2 = workbook.getSheetAt(1);
+        for (ParcelData parcelData : FileProcess.PARCEL_DATA_LIST) {
+                sheet2.getRow(rowIndex).getCell(0).setCellValue(parcelData.getTown());
+                sheet2.getRow(rowIndex).getCell(1).setCellValue(parcelData.getParcelId());
+                sheet2.getRow(rowIndex).getCell(3).setCellValue(parcelData.getUtilization());
+                sheet2.getRow(rowIndex).getCell(5).setCellValue(parcelData.getAdministersAsString());
+                rowIndex++;
+        }
+        workbook.write(out);
+        out.close();
     }
 }

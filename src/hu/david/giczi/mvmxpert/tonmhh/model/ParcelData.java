@@ -14,7 +14,7 @@ public class ParcelData {
     private String parcelId;
 
     private String utilization;
-    private final static String[] PARCEL_TYPE = {"belterült", "külterület", "zártkert"};
+    private final static String[] PARCEL_TYPE = {"belterület", "külterület", "zártkert"};
 
     private final List<String> administerList;
 
@@ -108,6 +108,14 @@ public class ParcelData {
 
     public List<String> getAdministerList() {
         return administerList;
+    }
+
+    public String getAdministersAsString(){
+        StringBuilder sb = new StringBuilder();
+        for (String administer : administerList) {
+            sb.append(administer).append("\n");
+        }
+        return sb.deleteCharAt(sb.length() - 1).toString();
     }
 
     public boolean isUpperCaseAdminister(String administer) {
