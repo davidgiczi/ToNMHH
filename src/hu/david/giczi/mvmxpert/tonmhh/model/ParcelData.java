@@ -14,6 +14,7 @@ public class ParcelData {
     private String parcelId;
 
     private String utilization;
+    private final static String[] PARCEL_TYPE = {"belterült", "külterület", "zártkert"};
 
     private final List<String> administerList;
 
@@ -48,7 +49,7 @@ public class ParcelData {
 
     public String createParcelId(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
        String parcelId = null;
-       if( "külterület".equals(location) ){
+       if( PARCEL_TYPE[1].equals(location) ){
 
            if( cell1 != null && cell2 != null && cell3 != null && cell4 != null &&
                    cell1.getCellType() == CellType.NUMERIC && cell2.getCellType() == CellType.NUMERIC &&
@@ -71,8 +72,8 @@ public class ParcelData {
            }
 
        }
-       else if( "belterület".equals(location) ||
-               "zártkert".equals(location) ) {
+       else if( PARCEL_TYPE[0].equals(location) ||
+               PARCEL_TYPE[2].equals(location) ) {
 
            if( cell1 != null && cell2 != null && cell3 != null && cell4 != null &&
                    cell1.getCellType() == CellType.NUMERIC && cell2.getCellType() == CellType.NUMERIC &&
