@@ -106,10 +106,6 @@ public class ParcelData {
         this.utilization = utilization.trim();
     }
 
-    public List<String> getAdministerList() {
-        return administerList;
-    }
-
     public String getAdministersAsString(){
         StringBuilder sb = new StringBuilder();
         for (String administer : administerList) {

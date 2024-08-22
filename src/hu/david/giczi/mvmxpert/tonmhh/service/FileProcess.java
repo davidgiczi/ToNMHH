@@ -2,13 +2,16 @@ package hu.david.giczi.mvmxpert.tonmhh.service;
 
 import hu.david.giczi.mvmxpert.tonmhh.model.ParcelData;
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -63,9 +66,10 @@ public class FileProcess {
             try {
                 getXLSXFileData();
             } catch (IOException e) {
+                e.printStackTrace();
                 JOptionPane.showMessageDialog(null,
                         "A kiválasztott fájl nem nyitható meg.",
-                        "Hibás fájl!", JOptionPane.WARNING_MESSAGE);
+                        "Hibás fájl", JOptionPane.WARNING_MESSAGE);
             }
         }
         else {
@@ -76,7 +80,7 @@ public class FileProcess {
 
 
     private void getXLSXFileData() throws IOException {
-        FileInputStream fis = new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
+     FileInputStream fis = new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
         String password = JOptionPane.showInputDialog(null, "Jelszó megadása:",
                     "A fájl jelszóval védett? Ha nem: OK", JOptionPane.QUESTION_MESSAGE);
         if( password == null ){
@@ -86,6 +90,7 @@ public class FileProcess {
          try{
              workbook = (XSSFWorkbook) WorkbookFactory.create(fis, password);
          }catch (EncryptedDocumentException e){
+             e.printStackTrace();
              JOptionPane.showMessageDialog(null, "A fájl nem nyitható meg.",
                      "Jelszó megadása szükséges", JOptionPane.WARNING_MESSAGE);
              return;
@@ -176,6 +181,7 @@ public class FileProcess {
             try {
                 saveParcelData(fileName);
             } catch (IOException e) {
+                e.printStackTrace();
                 FOLDER_PATH = null;
             }
         }

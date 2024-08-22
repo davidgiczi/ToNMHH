@@ -8,6 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="xlsx_creator_files" level="project" />
+    <orderEntry type="library" name="jdk1.8" level="project" />
+    <orderEntry type="library" name="apache-poi_5.2.3" level="project" />
   </component>
 </module>
