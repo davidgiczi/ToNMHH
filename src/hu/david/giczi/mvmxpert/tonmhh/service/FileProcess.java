@@ -2,8 +2,10 @@ package hu.david.giczi.mvmxpert.tonmhh.service;
 
 import hu.david.giczi.mvmxpert.tonmhh.model.ParcelData;
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -76,7 +78,7 @@ public class FileProcess {
     private void getXLSXFileData() throws IOException {
         FileInputStream fis = new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
         String password = JOptionPane.showInputDialog(null, "Jelszó megadása:",
-                    "A fájl jelszóval védett? Ha nem: OK.", JOptionPane.QUESTION_MESSAGE);
+                    "A fájl jelszóval védett? Ha nem: OK", JOptionPane.QUESTION_MESSAGE);
         if( password == null ){
             return;
         }
@@ -219,21 +221,28 @@ public class FileProcess {
         XSSFSheet sheet1 =  workbook.getSheetAt(0);
         int rowIndex = 1;
         for (ParcelData parcelData : FileProcess.PARCEL_DATA_LIST) {
-            sheet1.getRow(rowIndex).getCell(0).setCellValue(parcelData.getTown());
-            sheet1.getRow(rowIndex).getCell(1).setCellValue(parcelData.getLocation());
-            sheet1.getRow(rowIndex).getCell(2).setCellValue(parcelData.getParcelId());
+            XSSFRow row = sheet1.createRow(rowIndex);
+            row.createCell(0).setCellValue(parcelData.getTown());
+            row.createCell(1).setCellValue(parcelData.getLocation());
+            row.createCell(2).setCellValue(parcelData.getParcelId());
             rowIndex++;
         }
         rowIndex = 1;
         XSSFSheet sheet2 = workbook.getSheetAt(1);
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setWrapText(true);
         for (ParcelData parcelData : FileProcess.PARCEL_DATA_LIST) {
-                sheet2.getRow(rowIndex).getCell(0).setCellValue(parcelData.getTown());
-                sheet2.getRow(rowIndex).getCell(1).setCellValue(parcelData.getParcelId());
-                sheet2.getRow(rowIndex).getCell(3).setCellValue(parcelData.getUtilization());
-                sheet2.getRow(rowIndex).getCell(5).setCellValue(parcelData.getAdministersAsString());
-                rowIndex++;
+             XSSFRow row = sheet2.createRow(rowIndex);
+             row.createCell(0).setCellValue(parcelData.getTown());
+             row.createCell(1).setCellValue(parcelData.getParcelId());
+             row.createCell(3).setCellValue(parcelData.getUtilization());
+             XSSFCell cell = row.createCell(7);
+             cell.setCellStyle(cellStyle);
+             cell.setCellValue(parcelData.getAdministersAsString());
+             rowIndex++;
         }
         workbook.write(out);
         out.close();
+        workbook.close();
     }
 }

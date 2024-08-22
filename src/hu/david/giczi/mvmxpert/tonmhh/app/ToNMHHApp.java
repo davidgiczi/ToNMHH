@@ -26,7 +26,7 @@ public class ToNMHHApp {
         if( FileProcess.FOLDER_PATH == null ){
             JOptionPane.showMessageDialog(null,
                     "Földrészlet adatok nem menthetők.",
-                    "Hibás fájlnév vagy mentési művelet",
+                    "Hibás mentés",
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }

@@ -113,9 +113,9 @@ public class ParcelData {
     public String getAdministersAsString(){
         StringBuilder sb = new StringBuilder();
         for (String administer : administerList) {
-            sb.append(administer).append("\n");
+            sb.append(administer).append("\r\n");
         }
-        return sb.deleteCharAt(sb.length() - 1).toString();
+        return administerList.isEmpty() ? null :  sb.substring(0, sb.length() - 2);
     }
 
     public boolean isUpperCaseAdminister(String administer) {
