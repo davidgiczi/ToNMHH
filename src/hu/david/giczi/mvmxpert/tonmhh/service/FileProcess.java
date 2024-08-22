@@ -2,7 +2,11 @@ package hu.david.giczi.mvmxpert.tonmhh.service;
 
 import hu.david.giczi.mvmxpert.tonmhh.model.ParcelData;
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.crypt.Decryptor;
+import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.HashAlgorithm;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -17,6 +21,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.*;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -80,21 +85,27 @@ public class FileProcess {
 
 
     private void getXLSXFileData() throws IOException {
-     FileInputStream fis = new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
+        FileInputStream fis = new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
         String password = JOptionPane.showInputDialog(null, "Jelszó megadása:",
                     "A fájl jelszóval védett? Ha nem: OK", JOptionPane.QUESTION_MESSAGE);
         if( password == null ){
             return;
         }
-        XSSFWorkbook workbook;
-         try{
-             workbook = (XSSFWorkbook) WorkbookFactory.create(fis, password);
-         }catch (EncryptedDocumentException e){
-             e.printStackTrace();
-             JOptionPane.showMessageDialog(null, "A fájl nem nyitható meg.",
-                     "Jelszó megadása szükséges", JOptionPane.WARNING_MESSAGE);
-             return;
-         }
+        POIFSFileSystem fs = new POIFSFileSystem(fis);
+        EncryptionInfo info = new EncryptionInfo(fs);
+        Decryptor decryptor = Decryptor.getInstance(info);
+        XSSFWorkbook workbook = null;
+        try {
+            if( !decryptor.verifyPassword(password) ){
+                JOptionPane.showMessageDialog(null, "A fájl nem nyitható meg.",
+                    "Jelszó megadása szükséges", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+            workbook = new XSSFWorkbook(decryptor.getDataStream(fs));
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+
         XSSFSheet sheet = workbook.getSheetAt(0);
         parseParcelData(sheet);
     }
