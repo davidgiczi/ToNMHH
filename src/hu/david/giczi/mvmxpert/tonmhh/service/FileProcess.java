@@ -1,16 +1,15 @@
 package hu.david.giczi.mvmxpert.tonmhh.service;
 
 import hu.david.giczi.mvmxpert.tonmhh.model.ParcelData;
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
-import org.apache.poi.poifs.crypt.HashAlgorithm;
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -21,6 +20,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +74,9 @@ public class FileProcess {
             } catch (IOException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null,
-                        "A kiválasztott fájl nem nyitható meg.",
-                        "Hibás fájl", JOptionPane.WARNING_MESSAGE);
+                        "Hibás fájl.",
+                        "A kiválasztott fájl nem nyitható meg",
+                        JOptionPane.WARNING_MESSAGE);
             }
         }
         else {
@@ -85,29 +87,65 @@ public class FileProcess {
 
 
     private void getXLSXFileData() throws IOException {
-        FileInputStream fis = new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
-        String password = JOptionPane.showInputDialog(null, "Jelszó megadása:",
-                    "A fájl jelszóval védett? Ha nem: OK", JOptionPane.QUESTION_MESSAGE);
-        if( password == null ){
-            return;
-        }
-        POIFSFileSystem fs = new POIFSFileSystem(fis);
-        EncryptionInfo info = new EncryptionInfo(fs);
-        Decryptor decryptor = Decryptor.getInstance(info);
-        XSSFWorkbook workbook = null;
-        try {
-            if( !decryptor.verifyPassword(password) ){
-                JOptionPane.showMessageDialog(null, "A fájl nem nyitható meg.",
-                    "Jelszó megadása szükséges", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-            workbook = new XSSFWorkbook(decryptor.getDataStream(fs));
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
+    int option =  JOptionPane.showOptionDialog(null, "A fájl jelszóval védett?",
+                "Fájl megnyitása", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, new Object[]{"Igen", "Nem"}, "Igen");
+        if( option == 0 ){
+            String password = JOptionPane.showInputDialog(null, "Jelszó megadása:",
+                    "A fájl megnyitása", JOptionPane.QUESTION_MESSAGE);
 
-        XSSFSheet sheet = workbook.getSheetAt(0);
-        parseParcelData(sheet);
+            if( password != null ){
+
+                try {
+                    openWorkbookByPassword(password);
+                } catch (GeneralSecurityException e) {
+                    e.printStackTrace();
+                }
+    }
+}
+       else {
+        openWorkbook();
+       }
+    }
+
+    private void openWorkbookByPassword(String password)
+            throws IOException, GeneralSecurityException {
+        try {
+            FileInputStream fis = new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
+            POIFSFileSystem fs = new POIFSFileSystem(fis);
+            EncryptionInfo info = new EncryptionInfo(fs);
+            Decryptor decryptor = Decryptor.getInstance(info);
+            if (decryptor.verifyPassword(password)) {
+                XSSFWorkbook workbook = new XSSFWorkbook(decryptor.getDataStream(fs));
+                XSSFSheet sheet = workbook.getSheetAt(0);
+                parseParcelData(sheet);
+                fis.close();
+                workbook.close();
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "Nem megfelelő jelszó.",
+                        "A kiválasztott fájl nem nyitható meg", JOptionPane.WARNING_MESSAGE);
+            }
+        }catch (OfficeXmlFileException e){
+            JOptionPane.showMessageDialog(null,
+                    "A fájl jelszó nélkül nyitható meg.",
+                    "A kiválasztott fájl nem nyitható meg", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void openWorkbook() throws IOException {
+        FileInputStream fis =  new FileInputStream(FOLDER_PATH + "/" + FILE_NAME);
+        try {
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            parseParcelData(sheet);
+            fis.close();
+            workbook.close();
+        } catch (OLE2NotOfficeXmlFileException e){
+            JOptionPane.showMessageDialog(null,
+                    "A fájl jelszóval védett.",
+                    "A kiválasztott fájl nem nyitható meg", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void parseParcelData(XSSFSheet sheet){
