@@ -17,10 +17,12 @@ public class ParcelData {
     private final static String[] PARCEL_TYPE = {"belterület", "külterület", "zártkert"};
 
     private final List<String> administerList;
+    private final List<Address> administerAdressList;
 
 
     public ParcelData() {
         this.administerList = new ArrayList<>();
+        this.administerAdressList = new ArrayList<>();
     }
 
     public String getTown() {
@@ -45,6 +47,10 @@ public class ParcelData {
 
     public void setParcelId(String parcelId) {
         this.parcelId = parcelId;
+    }
+
+    public List<Address> getAdministerAdressList() {
+        return administerAdressList;
     }
 
     public String createParcelId(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
@@ -114,6 +120,92 @@ public class ParcelData {
         return administerList.isEmpty() ? null :  sb.substring(0, sb.length() - 2);
     }
 
+    public String getAdministerZipCodeAsString(){
+        StringBuilder sb = new StringBuilder();
+        for (Address address : administerAdressList) {
+            if(address.getCompleteAddress() != null ){
+                sb.append(address.getCompleteAddress()).append("\r\n");
+                continue;
+            }
+            if( address.getZipCode() != null ){
+                sb.append(address.getZipCode()).append("\r\n");
+            }
+            else {
+                sb.append("-").append("\r\n");
+            }
+        }
+        return sb.toString().isEmpty() ? null :  sb.substring(0, sb.length() - 2);
+    }
+
+    public String getAdministerTownAsString(){
+        StringBuilder sb = new StringBuilder();
+        for (Address address : administerAdressList) {
+            if(address.getCompleteAddress() != null ){
+                sb.append(address.getCompleteAddress()).append("\r\n");
+                continue;
+            }
+            if( address.getTown() != null ){
+                sb.append(address.getTown()).append("\r\n");
+            }
+            else {
+                sb.append("-").append("\r\n");
+            }
+        }
+        return sb.toString().isEmpty() ? null :  sb.substring(0, sb.length() - 2);
+    }
+
+    public String getAdministerLocationNameAsString(){
+        StringBuilder sb = new StringBuilder();
+        for (Address address : administerAdressList) {
+            if(address.getCompleteAddress() != null ){
+                sb.append(address.getCompleteAddress()).append("\r\n");
+                continue;
+            }
+            if( address.getLocationName() != null ){
+                sb.append(address.getLocationName()).append("\r\n");
+            }
+            else {
+                sb.append("-").append("\r\n");
+            }
+        }
+        return sb.toString().isEmpty() ? null :  sb.substring(0, sb.length() - 2);
+    }
+
+    public String getAdministerLocationTypeAsString(){
+        StringBuilder sb = new StringBuilder();
+        for (Address address : administerAdressList) {
+            if(address.getCompleteAddress() != null ){
+                sb.append(address.getCompleteAddress()).append("\r\n");
+                continue;
+            }
+            if( address.getLocationType() != null ){
+                sb.append(address.getLocationType()).append("\r\n");
+            }
+            else {
+                sb.append("-").append("\r\n");
+            }
+        }
+        return sb.toString().isEmpty() ? null :  sb.substring(0, sb.length() - 2);
+    }
+
+    public String getAdministerLocationNumberAsString(){
+        StringBuilder sb = new StringBuilder();
+        for (Address address : administerAdressList) {
+            if(address.getCompleteAddress() != null ){
+                sb.append(address.getCompleteAddress()).append("\r\n");
+                continue;
+            }
+            if( address.getLocationNumber() != null ){
+                sb.append(address.getLocationNumber()).append("\r\n");
+            }
+            else {
+                sb.append("-").append("\r\n");
+            }
+        }
+        return sb.toString().isEmpty() ? null :  sb.substring(0, sb.length() - 2);
+    }
+
+
     public boolean isUpperCaseAdminister(String administer) {
         String[] inputData = administer.trim().split("\\s+");
         int upperCase = 0;
@@ -128,10 +220,40 @@ public class ParcelData {
         }
        return upperCase == sumLength;
     }
-    public void addMinister(String administer) {
-        if (isUpperCaseAdminister(administer)) {
+    public void addMinister(String administer, String address) {
+        if ( isUpperCaseAdminister(administer) ) {
             administerList.add(administer.trim());
+            addMinisterAddress(address);
         }
+    }
+
+    private void addMinisterAddress(String address){
+        Address ownerAddress = new Address();
+        String[] addressData = address.split("\\s+");
+        if( addressData.length < 4 || addressData.length > 6){
+            ownerAddress.setCompleteAddress(address);
+            administerAdressList.add(ownerAddress);
+            return;
+        }
+        ownerAddress.setZipCode(addressData[0]);
+        ownerAddress.setTown(addressData[1]);
+       switch (addressData.length){
+           case 4:
+            ownerAddress.setLocationName(addressData[2]);
+            break;
+           case 5:
+            ownerAddress.setLocationName(addressData[2]);
+            ownerAddress.setLocationType(addressData[3]);
+            ownerAddress.setLocationNumber(addressData[4]);
+            break;
+           case 6:
+            ownerAddress.setLocationName(addressData[2] + " " + addressData[3]);
+            ownerAddress.setLocationType(addressData[4]);
+            ownerAddress.setLocationNumber(addressData[5]);
+        }
+
+        administerAdressList.add(ownerAddress);
+
     }
 
     @Override

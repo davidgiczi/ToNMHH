@@ -1,5 +1,6 @@
 package hu.david.giczi.mvmxpert.tonmhh.service;
 
+import hu.david.giczi.mvmxpert.tonmhh.model.Address;
 import hu.david.giczi.mvmxpert.tonmhh.model.ParcelData;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
@@ -168,7 +169,8 @@ public class FileProcess {
                 parcelData.setParcelId(parcelId);
                 parcelData.setTown(row.getCell(0).getStringCellValue());
                 parcelData.setUtilization(row.getCell(7).getStringCellValue());
-                parcelData.addMinister(row.getCell(10).getStringCellValue());
+                parcelData.addMinister(row.getCell(10).getStringCellValue(),
+                        row.getCell(11).getStringCellValue());
                 PARCEL_DATA_LIST.add(parcelData);
             }
 
@@ -181,7 +183,8 @@ public class FileProcess {
                 parcelData.setTown(row.getCell(0).getStringCellValue());
                 parcelData.setLocation(row.getCell(1).getStringCellValue());
                 parcelData.setUtilization(row.getCell(7).getStringCellValue());
-                parcelData.addMinister(row.getCell(10).getStringCellValue());
+                parcelData.addMinister(row.getCell(10).getStringCellValue(),
+                        row.getCell(11).getStringCellValue());
                 PARCEL_DATA_LIST.add(parcelData);
             }
 
@@ -190,7 +193,8 @@ public class FileProcess {
                     row.getCell(2), row.getCell(3),
                     row.getCell(4), row.getCell(5))) &&
                     PARCEL_DATA_LIST.contains(parcelData)) {
-                parcelData.addMinister(row.getCell(10).getStringCellValue());
+                parcelData.addMinister(row.getCell(10).getStringCellValue(),
+                        row.getCell(11).getStringCellValue());
             }
         }
         JOptionPane.showMessageDialog(null,
@@ -294,10 +298,34 @@ public class FileProcess {
              XSSFCell cell = row.createCell(7);
              cell.setCellStyle(cellStyle);
              cell.setCellValue(parcelData.getAdministersAsString());
+             if( parcelData.getAdministerZipCodeAsString() != null ){
+                 XSSFCell zipCode = row.createCell(9);
+                 zipCode.setCellStyle(cellStyle);
+                 zipCode.setCellValue(parcelData.getAdministerZipCodeAsString());
+             }
+            if( parcelData.getAdministerTownAsString() != null ){
+               XSSFCell town = row.createCell(10);
+               town.setCellStyle(cellStyle);
+               town.setCellValue(parcelData.getAdministerTownAsString());
+           }
+           if( parcelData.getAdministerLocationNameAsString() != null ){
+                XSSFCell locationName = row.createCell(11);
+                locationName.setCellStyle(cellStyle);
+                locationName.setCellValue(parcelData.getAdministerLocationNameAsString());
+            }
+           if( parcelData.getAdministerLocationTypeAsString() != null ){
+               XSSFCell locationType = row.createCell(12);
+               locationType.setCellStyle(cellStyle);
+               locationType.setCellValue(parcelData.getAdministerLocationTypeAsString());
+           }
+           if( parcelData.getAdministerLocationNumberAsString() != null ){
+               XSSFCell locationNumber = row.createCell(13);
+               locationNumber.setCellStyle(cellStyle);
+               locationNumber.setCellValue(parcelData.getAdministerLocationNumberAsString());
+           }
              rowIndex++;
         }
         workbook.write(out);
         out.close();
-        workbook.close();
     }
 }
