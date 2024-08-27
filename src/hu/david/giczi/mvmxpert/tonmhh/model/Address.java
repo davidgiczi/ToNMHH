@@ -8,7 +8,6 @@ public class Address {
     private String locationType;
     private String locationNumber;
     private String completeAddress;
-    private final static String[] LOCATION_TYPES = {"út", "utca", "tér", "körút", "tanya"};
 
     public String getTown() {
         return town;

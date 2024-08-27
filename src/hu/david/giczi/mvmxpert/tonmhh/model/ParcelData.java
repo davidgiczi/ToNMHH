@@ -17,12 +17,12 @@ public class ParcelData {
     private final static String[] PARCEL_TYPE = {"belterület", "külterület", "zártkert"};
 
     private final List<String> administerList;
-    private final List<Address> administerAdressList;
+    private final List<Address> administerAddressList;
 
 
     public ParcelData() {
         this.administerList = new ArrayList<>();
-        this.administerAdressList = new ArrayList<>();
+        this.administerAddressList = new ArrayList<>();
     }
 
     public String getTown() {
@@ -49,8 +49,8 @@ public class ParcelData {
         this.parcelId = parcelId;
     }
 
-    public List<Address> getAdministerAdressList() {
-        return administerAdressList;
+    public List<Address> getAdministerAddressList() {
+        return administerAddressList;
     }
 
     public String createParcelId(Cell cell1, Cell cell2, Cell cell3, Cell cell4) {
@@ -122,7 +122,7 @@ public class ParcelData {
 
     public String getAdministerZipCodeAsString(){
         StringBuilder sb = new StringBuilder();
-        for (Address address : administerAdressList) {
+        for (Address address : administerAddressList) {
             if(address.getCompleteAddress() != null ){
                 sb.append(address.getCompleteAddress()).append("\r\n");
                 continue;
@@ -139,9 +139,9 @@ public class ParcelData {
 
     public String getAdministerTownAsString(){
         StringBuilder sb = new StringBuilder();
-        for (Address address : administerAdressList) {
+        for (Address address : administerAddressList) {
             if(address.getCompleteAddress() != null ){
-                sb.append(address.getCompleteAddress()).append("\r\n");
+                sb.append("-").append("\r\n");
                 continue;
             }
             if( address.getTown() != null ){
@@ -156,9 +156,9 @@ public class ParcelData {
 
     public String getAdministerLocationNameAsString(){
         StringBuilder sb = new StringBuilder();
-        for (Address address : administerAdressList) {
+        for (Address address : administerAddressList) {
             if(address.getCompleteAddress() != null ){
-                sb.append(address.getCompleteAddress()).append("\r\n");
+                sb.append("-").append("\r\n");
                 continue;
             }
             if( address.getLocationName() != null ){
@@ -173,9 +173,9 @@ public class ParcelData {
 
     public String getAdministerLocationTypeAsString(){
         StringBuilder sb = new StringBuilder();
-        for (Address address : administerAdressList) {
+        for (Address address : administerAddressList) {
             if(address.getCompleteAddress() != null ){
-                sb.append(address.getCompleteAddress()).append("\r\n");
+                sb.append("-").append("\r\n");
                 continue;
             }
             if( address.getLocationType() != null ){
@@ -190,9 +190,9 @@ public class ParcelData {
 
     public String getAdministerLocationNumberAsString(){
         StringBuilder sb = new StringBuilder();
-        for (Address address : administerAdressList) {
+        for (Address address : administerAddressList) {
             if(address.getCompleteAddress() != null ){
-                sb.append(address.getCompleteAddress()).append("\r\n");
+                sb.append("-").append("\r\n");
                 continue;
             }
             if( address.getLocationNumber() != null ){
@@ -232,7 +232,7 @@ public class ParcelData {
         String[] addressData = address.split("\\s+");
         if( addressData.length < 4 || addressData.length > 6){
             ownerAddress.setCompleteAddress(address);
-            administerAdressList.add(ownerAddress);
+            administerAddressList.add(ownerAddress);
             return;
         }
         ownerAddress.setZipCode(addressData[0]);
@@ -252,7 +252,7 @@ public class ParcelData {
             ownerAddress.setLocationNumber(addressData[5]);
         }
 
-        administerAdressList.add(ownerAddress);
+        administerAddressList.add(ownerAddress);
 
     }
 
